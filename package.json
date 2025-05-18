@@ -1,0 +1,35 @@
+{
+  "name": "hallucigenia-engine",
+  "version": "0.1.0",
+  "description": "Threejs Engine with Web GPU",
+  "main": "index.html",
+  "repository": "",
+  "author": "Koh Tong Liang",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && cp assets dist/assets",
+    "preview": "vite preview",
+    "cleanup": "node ./scripts/cleanup.js",
+    "preinstall": "git submodule update --init --recursive"
+  },
+  "type": "module",
+  "dependencies": {
+    "lil-gui": "^0.20.0",
+    "three": "^0.176.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.176.0",
+    "prettier": "^3.5.0",
+    "sass": "^1.84.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.3.5",
+    "vite-plugin-glsl": "^1.4.1",
+    "vite-plugin-static-copy": "^3.0.0",
+    "vite-plugin-top-level-await": "^1.5.0"
+  },
+  "packageManager": "yarn@3.2.1",
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
