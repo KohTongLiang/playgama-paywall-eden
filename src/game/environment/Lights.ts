@@ -13,7 +13,7 @@ export const Lights = (): THREE.Group => {
 
     // Point light
     let light = new THREE.PointLight(0xff0000, 1, 100)
-    light.add(new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({ color: 0xff0000 })))
+    // light.add(new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({ color: 0xff0000 })))
     light.position.set(0, 1, 1)
     light.intensity = 5
 

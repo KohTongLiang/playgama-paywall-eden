@@ -1,5 +1,7 @@
 import glsl from 'vite-plugin-glsl'
 import topLevelAwait from 'vite-plugin-top-level-await'
+import wasmPlugin from 'vite-plugin-wasm'
+
 import { defineConfig } from 'vite'
 import path from 'path'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
@@ -23,6 +25,7 @@ export default defineConfig({
   },
   plugins: [
     glsl(),
+    wasmPlugin(),
     topLevelAwait({
       promiseExportName: '__tla',
       promiseImportName: (i) => `__tla_${i}`,

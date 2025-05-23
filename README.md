@@ -1,5 +1,11 @@
 # A Theejs engine
 
+## Dependencies
+
+* Rendering - [Threejs](https://threejs.org/docs/)
+* Physics - [Rapier](https://rapier.rs/docs/user_guides/javascript/getting_started_js)
+* Shader Library - [Lygia](https://github.com/patriciogonzalezvivo/lygia)
+
 ## Setup
 
 Retrieve relevant submodules
