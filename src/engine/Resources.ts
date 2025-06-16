@@ -23,7 +23,7 @@ type Loaders = {
 }
 
 export class Resources extends EventEmitter {
-  private loadingManager = new THREE.LoadingManager(
+  private readonly loadingManager = new THREE.LoadingManager(
     () => {
       this.emit('loaded')
     },

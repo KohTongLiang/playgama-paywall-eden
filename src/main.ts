@@ -9,7 +9,7 @@ const init = async () => {
     // Wait for engine to initialize with Rapier loaded
     await Engine.create({
       canvas: document.querySelector('#canvas') as HTMLCanvasElement,
-      experience: [Game, TheButton],
+      nodes: [Game, TheButton],
     })
     
     console.log('Engine initialized successfully')

@@ -1,46 +1,69 @@
-import * as THREE from 'three'
+import * as THREE from 'three';
 
-import { Engine } from './Engine'
-import { GameEntity } from './GameEntity'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
-import {WebGLRenderer} from "three";
+import { WebGPURenderer, PostProcessing } from 'three/src/Three.WebGPU';
+
+
+import { Engine } from './Engine';
+import { GameEntity } from './GameEntity';
+import { pass } from 'three/src/nodes/display/PassNode'
+// import { pass } from 'three/src/Three.TSL'
 
 export class RenderEngine implements GameEntity {
-  private readonly renderer: WebGLRenderer
-  composer: EffectComposer
+  // Renderer is now public readonly to allow access from other parts of the engine if needed
+  public readonly renderer: WebGPURenderer;
+  private readonly composer: PostProcessing;
+  private readonly engine: Engine;
 
-  constructor(private engine: Engine) {
-    this.renderer = new WebGLRenderer({
-      canvas: this.engine.canvas,
+  // Private constructor to enforce initialization via the static async method
+  private constructor(engine: Engine, renderer: WebGPURenderer, composer: PostProcessing) {
+    this.engine = engine;
+    this.renderer = renderer;
+    this.composer = composer;
+  }
+
+  /**
+   * Asynchronously creates and initializes the RenderEngine.
+   * This pattern ensures the renderer is fully initialized before we proceed.
+   */
+  public static async create(engine: Engine): Promise<RenderEngine> {
+    const renderer = new WebGPURenderer({
+      canvas: engine.canvas,
       antialias: true,
-    })
+    });
 
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace
-    this.renderer.toneMapping = THREE.CineonToneMapping
-    this.renderer.toneMappingExposure = 1.75
-    this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
-    this.renderer.setClearColor('#000000')
-    this.renderer.setSize(this.engine.sizes.width, this.engine.sizes.height)
-    this.renderer.setPixelRatio(Math.min(this.engine.sizes.pixelRatio, 2))
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.75;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    this.composer = new EffectComposer(this.renderer)
+    // We don't need to set a clear color here, as the scene's background or a pass will handle it.
 
-    const renderPass = new RenderPass(
-      this.engine.scene,
-      this.engine.camera.instance
-    )
-    this.composer.addPass(renderPass)
+    renderer.setSize(engine.sizes.width, engine.sizes.height);
+    renderer.setPixelRatio(Math.min(engine.sizes.pixelRatio, 2));
+
+    // Initialize the WebGPU renderer
+    await renderer.init();
+
+    // Setup post-processing
+    const scenePass = pass(engine.scene, engine.camera.instance);
+    const composer = new PostProcessing(renderer);
+    composer.outputNode = scenePass; // Assign the scene pass directly to the output
+
+    return new RenderEngine(engine, renderer, composer);
   }
 
-  update() {
-    this.composer.render()
+  // initEngine() is no longer needed as creation is handled asynchronously.
+
+  public update(): void {
+    // Only the composer needs to be rendered. It handles the scene render pass internally.
+    this.composer.renderAsync().then();
   }
 
-  resize() {
-    this.renderer.setSize(this.engine.sizes.width, this.engine.sizes.height)
-    this.composer.setSize(this.engine.sizes.width, this.engine.sizes.height)
-    this.composer.render()
+  public resize(): void {
+    // Update renderer dimensions. The composer will pick this up on the next render call.
+    this.renderer.setSize(this.engine.sizes.width, this.engine.sizes.height);
+
+    // You don't need to call renderAsync() here. The main update loop will handle it.
   }
 }

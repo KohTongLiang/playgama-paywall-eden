@@ -16,6 +16,7 @@ export default defineConfig({
     alias: {
       'three': path.resolve(__dirname, 'node_modules/three'),
       'three/webgpu': path.resolve(__dirname, 'node_modules/three/build/three.webgpu.min.js'),
+      // 'three/webgpu': path.resolve(__dirname, 'node_modules/three/src/Three.WebGPU'),
       // 'three' : 'three/webgpu',
       // 'three/tsl': 'three/webgpu',
       'three/tsl': path.resolve(__dirname, 'node_modules/three/build/three.tsl.js'),

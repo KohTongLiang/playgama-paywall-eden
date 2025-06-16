@@ -4,7 +4,7 @@ import { RenderLoop } from './RenderLoop'
 import { DebugUI } from './interface/DebugUI'
 import { Sizes } from './Sizes'
 import { Camera } from './Camera'
-import { Resources } from './Resources'
+import { Resource, Resources } from './Resources'
 import { InfoConfig, InfoUI } from './interface/InfoUI'
 import { Node } from './Node'
 import { Loader } from './interface/Loader'
@@ -14,7 +14,7 @@ import type RAPIER from '@dimforge/rapier3d'
 export class Engine {
   public readonly camera: Camera
   public readonly scene: THREE.Scene
-  public readonly renderEngine: RenderEngine
+  public renderEngine!: RenderEngine
   public readonly time: RenderLoop
   public readonly debug: DebugUI
   public readonly raycaster: Raycaster
@@ -29,37 +29,43 @@ export class Engine {
 
   /**
    * Static method to create and initialize the engine asynchronously
-   * This ensures Rapier is loaded before the engine starts
    */
   public static async create({
-    canvas,
-    experience,
-    info,
-  }: {
+                               canvas,
+                               nodes,
+                               info,
+                             }: {
     canvas: HTMLCanvasElement
-    experience: Node[]
+    nodes: Node[]
     info?: InfoConfig
   }): Promise<Engine> {
     // Load Rapier first
     Engine.rapier = await import('@dimforge/rapier3d')
-    
-    // Create and return the initialized engine
-    return new Engine({ canvas, experience, info })
+
+    // Create the engine instance
+    const engine = new Engine({ canvas, nodes, info })
+
+    // CORRECTED: Call the private async initializer without arguments
+    await engine.init()
+
+    // Return the fully initialized engine
+    return engine
   }
 
   private constructor({
-    canvas,
-    experience,
-    info,
-  }: {
+                        canvas,
+                        nodes,
+                        info,
+                      }: {
     canvas: HTMLCanvasElement
-    experience: Node[]
+    nodes: Node[]
     info?: InfoConfig
   }) {
+    // (Constructor code remains the same as before, no changes needed here)
     if (!canvas) {
       throw new Error('No canvas provided')
     }
-    
+
     if (!Engine.rapier) {
       throw new Error('Rapier must be loaded before creating an Engine instance')
     }
@@ -72,12 +78,10 @@ export class Engine {
     this.camera = new Camera(this)
     this.raycaster = new Raycaster(this)
     this.infoUI = new InfoUI(info)
-    this.renderEngine = new RenderEngine(this)
     this.experience = []
 
-    // Pool all resources from all experiences together for loading
     let resources : Resource[] = []
-    experience.forEach((e: Node) => {
+    nodes.forEach((e: Node) => {
       let newExperience = new e(this)
       this.experience.push(newExperience)
       resources = resources.concat(newExperience.resources)
@@ -88,7 +92,7 @@ export class Engine {
     this.physicsWorld = new Engine.rapier.World({
       x: 0.0,
       y: -9.81,
-      z: 0.0
+      z: 0.0,
     })
 
     this.resources.on('loaded', () => {
@@ -101,13 +105,23 @@ export class Engine {
     })
   }
 
+  /**
+   * CORRECTED: The init method's job is to CREATE the async components.
+   * It should not take any arguments.
+   */
+  private async init() {
+    // It uses `this` to pass the engine instance to the RenderEngine's creator.
+    this.renderEngine = await RenderEngine.create(this);
+  }
+
+  // update() and resize() methods remain the same, they will work correctly now.
   update(delta: number) {
     if (!this.loader?.isComplete) return
 
     this.physicsWorld.step()
     this.camera.update()
     this.renderEngine.update()
-    this.experience.forEach(ex => ex.delta)
+    this.experience.forEach(ex => ex.update(delta))
     this.debug.update()
   }
 

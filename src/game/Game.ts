@@ -33,33 +33,23 @@ export class Game implements Node {
     this.engine.scene.add(this.engine.resources.getItem("numpad"))
 
     /// Sample input mapping
-    // window.addEventListener("keydown", e => {
-    //   if (e.key === "w") {
-    //     boxPosition.z = 0.1;
-    //   }
-    //
-    //   if (e.key === "s") {
-    //     boxPosition.z = -0.1
-    //   }
-    //
-    //   if (e.key === "a") {
-    //     boxPosition.x = 0.1
-    //   }
-    //
-    //   if (e.key === "d") {
-    //     boxPosition.x = -0.1
-    //   }
-    // })
-    // window.addEventListener("keyup", (e) => {
-    //   if (e.key === "w" || e.key === "s") {
-    //     boxPosition.z = 0;
-    //   }
-    //
-    //   if (e.key === "a" || e.key === "d") {
-    //     boxPosition.x = 0
-    //   }
-    // })
+    window.addEventListener("keydown", e => {
+      if (e.key === "w") {
+        lightObject.position.setZ(lightObject.position.z + 0.1)
+      }
 
+      if (e.key === "s") {
+        lightObject.position.setZ(lightObject.position.z - 0.1)
+      }
+
+      if (e.key === "a") {
+        lightObject.position.setX(lightObject.position.x + 0.1)
+      }
+
+      if (e.key === "d") {
+        lightObject.position.setX(lightObject.position.x - 0.1)
+      }
+    })
   }
 
   resize() { }

@@ -4,7 +4,7 @@ export const Lights = (): THREE.Group => {
     const group = new THREE.Group();
 
     // Dir light
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+    let directionalLight = new THREE.SpotLight(0xffffff, 1)
     directionalLight.castShadow = true
     directionalLight.position.set(-25, 100, 100)
     directionalLight.rotation.set(45, 10, 0)

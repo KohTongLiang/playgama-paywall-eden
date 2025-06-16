@@ -1,0 +1,6 @@
+﻿.floating-ui {
+    position: absolute;
+    top: 50vh;
+    left: 50vh;
+    align-content: center;
+}
